@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';
+import { MovieService } from '../services/movie.service';
 
 @Component({
   selector: 'app-home',
@@ -8,5 +9,9 @@ import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';
   imports: [IonHeader, IonToolbar, IonTitle, IonContent],
 })
 export class HomePage {
-  constructor() {}
+  private movieService = inject(MovieService);
+
+  constructor() {
+    this.movieService.getPopularMovies().subscribe(res => console.log(res.results));
+  }
 }
