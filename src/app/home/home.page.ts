@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';
-
+import { db } from '../firebase';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -8,5 +8,7 @@ import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';
   imports: [IonHeader, IonToolbar, IonTitle, IonContent],
 })
 export class HomePage {
-  constructor() {}
+  constructor() {
+    console.log('Firestore OK:', db.app.options.projectId);
+  }
 }
