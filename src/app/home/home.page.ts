@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';
-import { MovieService } from '../services/movie.service';
+import { db } from '../firebase';
 
 @Component({
   selector: 'app-home',
@@ -9,9 +9,7 @@ import { MovieService } from '../services/movie.service';
   imports: [IonHeader, IonToolbar, IonTitle, IonContent],
 })
 export class HomePage {
-  private movieService = inject(MovieService);
-
   constructor() {
-    this.movieService.getPopularMovies().subscribe(res => console.log(res.results));
+    console.log('Firestore OK:', db.app.options.projectId);
   }
 }
