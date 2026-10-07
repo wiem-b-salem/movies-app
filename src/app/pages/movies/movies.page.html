@@ -1,13 +1,36 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>movies</ion-title>
+    <ion-title>Films</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">movies</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading()) {
+    <div class="center">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="center">
+      <p>{{ error() }}</p>
+      <ion-button (click)="loadMovies()">Réessayer</ion-button>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (movie of movies(); track movie.id) {
+        <ion-card class="movie-card">
+          @if (movie.posterUrl) {
+            <img [src]="movie.posterUrl" [alt]="movie.title" />
+          } @else {
+            <div class="no-poster">Pas d'affiche</div>
+          }
+          <ion-card-header>
+            <ion-card-title>{{ movie.title }}</ion-card-title>
+            <ion-card-subtitle>
+              {{ movie.releaseDate.slice(0, 4) }} · ⭐ {{ movie.rating.toFixed(1) }}
+            </ion-card-subtitle>
+          </ion-card-header>
+        </ion-card>
+      }
+    </div>
+  }
 </ion-content>

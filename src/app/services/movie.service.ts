@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { TMDB_API_KEY } from '../tmdb.config';
+import { Movie } from '../models/movie.model';
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {
@@ -13,19 +14,39 @@ export class MovieService {
     return { api_key: TMDB_API_KEY, language: 'fr-FR', ...extra };
   }
 
-  getPopularMovies(page = 1): Observable<any> {
-    return this.http.get(`${this.baseUrl}/movie/popular`, { params: this.params({ page }) });
+  // Convertit un film TMDB vers le format Movie de Wiem
+  private toMovie(m: any): Movie {
+    return {
+      id: 'tmdb_' + m.id,
+      title: m.title,
+      overview: m.overview ?? '',
+      posterUrl: this.getImageUrl(m.poster_path),
+      releaseDate: m.release_date ?? '',
+      rating: m.vote_average ?? 0,
+      source: 'tmdb',
+    };
   }
 
-  searchMovies(query: string, page = 1): Observable<any> {
-    return this.http.get(`${this.baseUrl}/search/movie`, { params: this.params({ query, page }) });
+  getPopularMovies(page = 1): Observable<Movie[]> {
+    return this.http
+      .get<any>(`${this.baseUrl}/movie/popular`, { params: this.params({ page }) })
+      .pipe(map((res) => res.results.map((m: any) => this.toMovie(m))));
   }
 
-  getMovieDetails(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/movie/${id}`, { params: this.params() });
+  searchMovies(query: string, page = 1): Observable<Movie[]> {
+    return this.http
+      .get<any>(`${this.baseUrl}/search/movie`, { params: this.params({ query, page }) })
+      .pipe(map((res) => res.results.map((m: any) => this.toMovie(m))));
+  }
+
+  // tmdbId = le numéro TMDB seul (550), sans le préfixe "tmdb_"
+  getMovieDetails(tmdbId: number): Observable<Movie> {
+    return this.http
+      .get<any>(`${this.baseUrl}/movie/${tmdbId}`, { params: this.params() })
+      .pipe(map((m) => this.toMovie(m)));
   }
 
   getImageUrl(path: string | null): string {
-    return path ? this.imageUrl + path : 'assets/no-poster.png';
+    return path ? this.imageUrl + path : '';
   }
 }
