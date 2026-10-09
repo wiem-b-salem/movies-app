@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import {
   IonContent,
@@ -33,6 +34,7 @@ import { Movie } from '../../models/movie.model';
     IonCardSubtitle,
     IonSpinner,
     IonButton,
+    RouterLink,
     CommonModule,
     FormsModule,
   ],

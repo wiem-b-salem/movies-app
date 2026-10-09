@@ -17,7 +17,7 @@
   } @else {
     <div class="grid">
       @for (movie of movies(); track movie.id) {
-        <ion-card class="movie-card">
+        <ion-card class="movie-card" [button]="true" [routerLink]="['/movie-details', movie.id]">
           @if (movie.posterUrl) {
             <img [src]="movie.posterUrl" [alt]="movie.title" />
           } @else {

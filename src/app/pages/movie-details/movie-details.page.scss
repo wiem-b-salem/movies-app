@@ -1,0 +1,54 @@
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70%;
+  gap: 12px;
+}
+
+.details {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.poster {
+  display: block;
+  width: 60%;
+  max-width: 280px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  margin: 0 auto 16px;
+  border-radius: 12px;
+}
+
+.no-poster {
+  background: #444;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  text-align: center;
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+
+.meta {
+  text-align: center;
+  opacity: 0.8;
+  margin: 0 0 16px;
+}
+
+h2 {
+  font-size: 16px;
+  margin: 16px 0 6px;
+}
+
+.overview {
+  line-height: 1.5;
+  margin: 0;
+}

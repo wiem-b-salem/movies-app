@@ -1,13 +1,43 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>movie-details</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/movies"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Détails du film</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">movie-details</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading()) {
+    <div class="center">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="center">
+      <p>{{ error() }}</p>
+      <ion-button (click)="loadMovie()">Réessayer</ion-button>
+    </div>
+  } @else if (movie(); as m) {
+    <div class="details">
+      @if (m.posterUrl) {
+        <img class="poster" [src]="m.posterUrl" [alt]="m.title" />
+      } @else {
+        <div class="poster no-poster">Pas d'affiche</div>
+      }
+
+      <h1>{{ m.title }}</h1>
+
+      <p class="meta">
+        @if (m.releaseDate) {
+          <span>{{ m.releaseDate }}</span> ·
+        }
+        <span>⭐ {{ m.rating.toFixed(1) }}</span>
+      </p>
+
+      <h2>Résumé</h2>
+      <p class="overview">
+        {{ m.overview || 'Aucun résumé disponible.' }}
+      </p>
+    </div>
+  }
 </ion-content>
