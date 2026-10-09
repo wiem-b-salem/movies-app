@@ -17,19 +17,29 @@
   } @else {
     <div class="grid">
       @for (movie of movies(); track movie.id) {
-        <ion-card class="movie-card" [button]="true" [routerLink]="['/movie-details', movie.id]">
-          @if (movie.posterUrl) {
-            <img [src]="movie.posterUrl" [alt]="movie.title" />
-          } @else {
-            <div class="no-poster">Pas d'affiche</div>
-          }
-          <ion-card-header>
-            <ion-card-title>{{ movie.title }}</ion-card-title>
-            <ion-card-subtitle>
-              {{ movie.releaseDate.slice(0, 4) }} · ⭐ {{ movie.rating.toFixed(1) }}
-            </ion-card-subtitle>
-          </ion-card-header>
-        </ion-card>
+        <div class="card-wrap">
+          <ion-card class="movie-card" [button]="true" [routerLink]="['/movie-details', movie.id]">
+            @if (movie.posterUrl) {
+              <img [src]="movie.posterUrl" [alt]="movie.title" />
+            } @else {
+              <div class="no-poster">Pas d'affiche</div>
+            }
+            <ion-card-header>
+              <ion-card-title>{{ movie.title }}</ion-card-title>
+              <ion-card-subtitle>
+                {{ movie.releaseDate.slice(0, 4) }} · ⭐ {{ movie.rating.toFixed(1) }}
+              </ion-card-subtitle>
+            </ion-card-header>
+          </ion-card>
+
+          <ion-button class="fav-btn" fill="solid" size="small" (click)="toggleFavorite(movie, $event)">
+            <ion-icon
+              slot="icon-only"
+              color="danger"
+              [name]="isFavorite(movie.id) ? 'heart' : 'heart-outline'"
+            ></ion-icon>
+          </ion-button>
+        </div>
       }
     </div>
   }

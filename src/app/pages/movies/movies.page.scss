@@ -42,3 +42,18 @@
     font-size: 12px;
   }
 }
+.card-wrap {
+  position: relative;
+}
+
+.fav-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  --background: rgba(0, 0, 0, 0.5);
+  --border-radius: 50%;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  margin: 0;
+}

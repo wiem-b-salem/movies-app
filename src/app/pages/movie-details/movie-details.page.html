@@ -4,6 +4,17 @@
       <ion-back-button defaultHref="/movies"></ion-back-button>
     </ion-buttons>
     <ion-title>Détails du film</ion-title>
+    @if (movie()) {
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleFavorite()">
+          <ion-icon
+            slot="icon-only"
+            color="danger"
+            [name]="isFavorite() ? 'heart' : 'heart-outline'"
+          ></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 
@@ -33,6 +44,10 @@
         }
         <span>⭐ {{ m.rating.toFixed(1) }}</span>
       </p>
+
+      @if (favError()) {
+        <p class="fav-error">{{ favError() }}</p>
+      }
 
       <h2>Résumé</h2>
       <p class="overview">
