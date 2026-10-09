@@ -2,6 +2,26 @@
   <ion-toolbar>
     <ion-title>Films</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Rechercher un film"
+      [debounce]="0"
+      (ionInput)="onSearch($event)"
+    ></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="sourceFilter()" (ionChange)="onFilterChange($event)">
+      <ion-segment-button value="all">
+        <ion-label>Tous</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="tmdb">
+        <ion-label>TMDB</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="firebase">
+        <ion-label>Admin</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -15,6 +35,22 @@
       <ion-button (click)="loadMovies()">Réessayer</ion-button>
     </div>
   } @else {
+    @if (searching()) {
+      <div class="searching">
+        <ion-spinner name="dots"></ion-spinner>
+      </div>
+    }
+
+    @if (searchError()) {
+      <p class="search-error">{{ searchError() }}</p>
+    }
+
+    @if (!searching() && !searchError() && movies().length === 0) {
+      <div class="empty">
+        <p>Aucun film trouvé.</p>
+      </div>
+    }
+
     <div class="grid">
       @for (movie of movies(); track movie.id) {
         <div class="card-wrap">

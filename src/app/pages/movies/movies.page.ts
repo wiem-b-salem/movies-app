@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -18,6 +18,10 @@ import {
   IonSpinner,
   IonButton,
   IonIcon,
+  IonSearchbar,
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
 } from '@ionic/angular';
 import { auth } from '../../firebase';
 import { MovieService } from '../../services/movie.service';
@@ -27,6 +31,8 @@ import { Movie } from '../../models/movie.model';
 
 // TEMPORAIRE : identifiant de test tant que la connexion d'Eya n'existe pas
 const TEST_UID = 'test-user-mariem';
+
+type SourceFilter = 'all' | 'tmdb' | 'firebase';
 
 @Component({
   selector: 'app-movies',
@@ -44,6 +50,10 @@ const TEST_UID = 'test-user-mariem';
     IonSpinner,
     IonButton,
     IonIcon,
+    IonSearchbar,
+    IonSegment,
+    IonSegmentButton,
+    IonLabel,
     RouterLink,
     CommonModule,
     FormsModule,
@@ -54,12 +64,42 @@ export class MoviesPage implements OnInit {
   private firebaseMovieService = inject(FirebaseMovieService);
   private favoritesService = inject(FavoritesService);
 
-  movies = signal<Movie[]>([]);
+  // --- Sources de films ---
+  tmdbMovies = signal<Movie[]>([]);
+  firebaseMovies = signal<Movie[]>([]);
+  private popularMovies: Movie[] = []; // pour revenir aux populaires sans redemander
+
+  // --- Recherche et filtre ---
+  searchText = signal('');
+  sourceFilter = signal<SourceFilter>('all');
+  searching = signal(false);
+  searchError = signal('');
+  private searchTimer: ReturnType<typeof setTimeout> | undefined;
+  private lastRequestId = 0;
+
+  // --- État de la page ---
   loading = signal(true);
   error = signal('');
 
+  // --- Favoris ---
   uid = signal<string | null>(null);
   favoriteIds = signal<string[]>([]);
+
+  // Liste affichée : se recalcule toute seule quand une information change
+  movies = computed(() => {
+    const query = this.searchText().trim().toLowerCase();
+    const filter = this.sourceFilter();
+
+    let fb = this.firebaseMovies();
+    if (query) {
+      fb = fb.filter((m) => m.title.toLowerCase().includes(query));
+    }
+    const tmdb = this.tmdbMovies();
+
+    if (filter === 'tmdb') return tmdb;
+    if (filter === 'firebase') return fb;
+    return [...fb, ...tmdb]; // films de l'admin en premier
+  });
 
   constructor() {
     addIcons({ heart, heartOutline });
@@ -84,7 +124,7 @@ export class MoviesPage implements OnInit {
     this.error.set('');
 
     try {
-      const [tmdbMovies, firebaseMovies] = await Promise.all([
+      const [tmdb, fb] = await Promise.all([
         firstValueFrom(this.movieService.getPopularMovies()),
         this.firebaseMovieService.getMovies().catch((err) => {
           console.warn('Films Firebase non chargés :', err);
@@ -92,8 +132,14 @@ export class MoviesPage implements OnInit {
         }),
       ]);
 
-      // Films de l'admin en premier, puis ceux de TMDB
-      this.movies.set([...firebaseMovies, ...tmdbMovies]);
+      this.popularMovies = tmdb;
+      this.tmdbMovies.set(tmdb);
+      this.firebaseMovies.set(fb);
+
+      // Si une recherche était déjà tapée, on la relance
+      if (this.searchText().trim()) {
+        this.searchTmdb();
+      }
     } catch {
       this.error.set('Impossible de charger les films.');
     } finally {
@@ -101,6 +147,54 @@ export class MoviesPage implements OnInit {
     }
   }
 
+  // --- Recherche ---
+
+  // Appelée à chaque lettre tapée dans la barre de recherche
+  onSearch(event: Event) {
+    const value = ((event as CustomEvent).detail.value ?? '') as string;
+    this.searchText.set(value);
+    this.searching.set(value.trim() !== '');
+
+    // On attend 0,5 s après la dernière lettre avant de contacter TMDB
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => this.searchTmdb(), 500);
+  }
+
+  private async searchTmdb() {
+    const query = this.searchText().trim();
+    const requestId = ++this.lastRequestId;
+    this.searchError.set('');
+
+    // Recherche vide : on remet les films populaires
+    if (!query) {
+      this.tmdbMovies.set(this.popularMovies);
+      this.searching.set(false);
+      return;
+    }
+
+    this.searching.set(true);
+    try {
+      const results = await firstValueFrom(this.movieService.searchMovies(query));
+      if (requestId !== this.lastRequestId) return; // réponse trop ancienne : on l'ignore
+      this.tmdbMovies.set(results);
+    } catch {
+      if (requestId !== this.lastRequestId) return;
+      this.tmdbMovies.set([]);
+      this.searchError.set('La recherche a échoué. Réessayez.');
+    } finally {
+      if (requestId === this.lastRequestId) {
+        this.searching.set(false);
+      }
+    }
+  }
+
+  // --- Filtre ---
+  onFilterChange(event: Event) {
+    const value = (event as CustomEvent).detail.value as SourceFilter;
+    this.sourceFilter.set(value);
+  }
+
+  // --- Favoris ---
   async loadFavorites() {
     const uid = this.uid();
     if (!uid) return;

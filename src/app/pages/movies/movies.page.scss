@@ -57,3 +57,21 @@
   --padding-end: 6px;
   margin: 0;
 }
+.searching {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+
+.search-error {
+  text-align: center;
+  color: var(--ion-color-danger);
+  padding: 12px;
+  margin: 0;
+}
+
+.empty {
+  text-align: center;
+  opacity: 0.7;
+  padding: 32px 16px;
+}
