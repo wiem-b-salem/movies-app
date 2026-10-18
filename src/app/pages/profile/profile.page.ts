@@ -1,19 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import {
+  IonAvatar, IonBackButton, IonButton, IonButtons, IonContent, IonHeader,
+  IonItem, IonLabel, IonList, IonTitle, IonToolbar,
+} from '@ionic/angular';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
-  styleUrls: ['./profile.page.scss'],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [
+    IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent,
+    IonAvatar, IonList, IonItem, IonLabel, IonButton,
+  ],
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor() { }
+  profile = this.authService.profile;
 
-  ngOnInit() {
+  async logout() {
+    await this.authService.logout();
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
-
 }
