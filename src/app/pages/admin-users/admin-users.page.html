@@ -1,13 +1,33 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin-users</ion-title>
+    <ion-title>Utilisateurs</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin-users</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading()) {
+    <div class="center"><ion-spinner></ion-spinner></div>
+  } @else {
+    @if (error()) {
+      <p class="center error">Une erreur est survenue. Réessayez.</p>
+    }
+    @for (u of users(); track u.uid) {
+      <ion-item>
+        <ion-avatar slot="start">
+          <img [src]="u.photo || 'assets/icon/favicon.png'" [alt]="u.prenom" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ u.prenom }} {{ u.nom }}</h2>
+          <p>{{ u.email }} · {{ u.role }}</p>
+        </ion-label>
+        <ion-toggle
+          slot="end"
+          [checked]="u.active"
+          [disabled]="u.uid === myUid"
+          (ionChange)="toggle(u, $event.detail.checked)"
+        ></ion-toggle>
+      </ion-item>
+    }
+  }
 </ion-content>
+

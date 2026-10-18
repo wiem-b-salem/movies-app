@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Movie } from '../models/movie.model';
 
@@ -28,5 +28,10 @@ export class FirebaseMovieService {
   async getMovieById(firestoreId: string): Promise<Movie | null> {
     const snap = await getDoc(doc(db, 'movies', firestoreId));
     return snap.exists() ? this.toMovie(snap.id, snap.data()) : null;
+  }
+    // Ajoute un film dans la collection "movies" (admin). Retourne l'id Firestore
+  async addMovie(data: Omit<Movie, 'id' | 'source'>): Promise<string> {
+    const ref = await addDoc(collection(db, 'movies'), data);
+    return ref.id;
   }
 }

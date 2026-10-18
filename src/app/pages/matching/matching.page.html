@@ -1,13 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>matching</ion-title>
+    <ion-title>Matching</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">matching</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading()) {
+    <div class="center"><ion-spinner></ion-spinner></div>
+  } @else if (error()) {
+    <p class="center">Erreur de chargement. Réessayez.</p>
+  } @else if (matches().length === 0) {
+    <p class="center">Aucun match au-dessus de {{ threshold }} %.</p>
+  } @else {
+    @for (m of matches(); track m.user.uid) {
+      <ion-item>
+        <ion-avatar slot="start">
+          <img [src]="m.user.photo || 'assets/icon/favicon.png'" [alt]="m.user.prenom" />
+        </ion-avatar>
+        <ion-label>{{ m.user.prenom }} {{ m.user.nom }}</ion-label>
+        <ion-note slot="end">{{ m.rate | number: '1.0-0' }} %</ion-note>
+      </ion-item>
+    }
+  }
 </ion-content>
