@@ -59,7 +59,7 @@ export class RegisterPage {
         nom: v.nom.trim(), prenom: v.prenom.trim(), age: Number(v.age),
         email: v.email.trim(), password: v.password, photo: this.photo(),
       });
-      this.router.navigateByUrl('/movies', { replaceUrl: true });
+      this.router.navigateByUrl('/tabs/movies', { replaceUrl: true });
     } catch (e) {
       this.toast(authErrorMessage(e));
     } finally {

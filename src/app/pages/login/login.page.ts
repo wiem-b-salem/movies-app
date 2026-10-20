@@ -34,7 +34,7 @@ export class LoginPage {
     try {
       const { email, password } = this.form.getRawValue();
       await this.authService.login(email.trim(), password);
-      this.router.navigateByUrl('/movies', { replaceUrl: true });
+      this.router.navigateByUrl('/tabs/movies', { replaceUrl: true });
     } catch (e) {
       this.toast(authErrorMessage(e));
     } finally {
